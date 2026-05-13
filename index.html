@@ -2110,7 +2110,9 @@ async function openModal(malId) {
 function selectSeasonPill(btn, seasonNum) {
     document.querySelectorAll('#season-pills .season-pill').forEach(p => p.classList.remove('active'));
     btn.classList.add('active');
+    modal.style.display = 'none';
     updateEpisodes(seasonNum);
+    
 }
 
 // Safe episode URL map — avoids breaking onclick when URLs contain quotes/special chars
