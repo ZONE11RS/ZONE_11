@@ -1,55 +1,47 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>تجرية تطوير واجهة Otaku Zone</title>
     <style>
-        body { background: #080808; color: white; text-align: center; font-family: sans-serif; }
-        .player-wrapper { width: 90%; max-width: 850px; margin: 50px auto; border: 2px solid #333; border-radius: 15px; overflow: hidden; box-shadow: 0 0 20px rgba(255,0,0,0.2); }
-        iframe { width: 100%; height: 480px; border: none; }
-        .status { margin-top: 10px; color: #ff0000; font-weight: bold; }
+        body { background: #000; color: white; font-family: sans-serif; text-align: center; }
+        /* تصميم الحاوية لتشبه Blkom */
+        .player-container { 
+            max-width: 800px; margin: 40px auto; 
+            border: 1px solid #333; border-radius: 12px; overflow: hidden;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.2);
+        }
+        iframe { width: 100%; height: 450px; border: none; }
+        .info { color: #ff0000; margin-top: 15px; font-size: 14px; }
     </style>
 </head>
 <body>
 
-    <h2>تجرية تغيير لون زر الـ Play (UI Internal)</h2>
-    
-    <div class="player-wrapper">
-        <iframe id="targetPlayer" src="https://seekstreaming.com/embed/YOUR_VIDEO_ID?api=zone11rs.github.io" allowfullscreen></iframe>
+    <h3>Otaku Zone - UI Internal Test</h3>
+
+    <div class="player-container">
+        <iframe id="otakuPlayer" src="https://seekstreaming.com/embed-YOUR_VIDEO_ID.html?api=zone11rs.github.io" allowfullscreen></iframe>
     </div>
 
-    <div id="msg" class="status">انتظار تحميل المشغل...</div>
+    <div id="status" class="info">جاري محاولة تغيير لون زر Play للأحمر...</div>
 
     <script>
-        const playerIframe = document.getElementById('targetPlayer');
-        
-        // التوكينات الخاصة بك (للتجربة المباشرة فقط)
-        const tokens = {
-            seek: "d49f4971ed032005980c7443",
-            player4me: "4cb808112cc3dd376fbb311d"
-        };
+        const player = document.getElementById('otakuPlayer');
+        const myToken = "d49f4971ed032005980c7443";
 
-        playerIframe.onload = function() {
-            document.getElementById('msg').innerText = "تم التحميل! نرسل الآن الألوان الجديدة لداخل المشغل...";
-            
-            // نرسل الأوامر لداخل الـ iframe مباشرة
-            // ملاحظة: قد تختلف مسميات الأوامر حسب تحديث السيرفر (setTheme أو updateSettings)
+        player.onload = function() {
+            // الأمر البرمجي لتغيير الـ UI الداخلي
             const config = {
-                api_token: tokens.seek, // أو استخدم tokens.player4me حسب السيرفر
-                command: 'setTheme', 
+                api_token: myToken,
+                command: 'setTheme', // جرب 'updateSettings' إذا لم يعمل هذا
                 value: {
-                    primaryColor: '#ff0000', // اللون الأحمر لزر الـ Play
-                    controlBar: '#000000',
+                    primaryColor: '#ff0000', // هذا ما سيجعل الزر أحمر
                     showLogo: false
                 }
             };
 
-            // إرسال "الأعصاب" لداخل المشغل لتغيير شكله
-            playerIframe.contentWindow.postMessage(JSON.stringify(config), '*');
-            
-            setTimeout(() => {
-                document.getElementById('msg').innerText = "مبروك! المفترض أن اللون تغير الآن للأحمر.";
-            }, 2000);
+            // إرسال الأمر للمشغل
+            player.contentWindow.postMessage(JSON.stringify(config), '*');
+            document.getElementById('status').innerText = "تم إرسال أوامر التخصيص بنجاح!";
         };
     </script>
 </body>
