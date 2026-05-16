@@ -1,54 +1,56 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Otaku Zone Player - UI Test</title>
     <style>
-        body { background: #000; color: white; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; }
-        .player-wrapper { width: 95%; max-width: 850px; border: 1px solid #333; border-radius: 12px; overflow: hidden; box-shadow: 0 0 40px rgba(255, 0, 0, 0.3); }
-        iframe { width: 100%; height: 480px; border: none; background: #000; }
-        .status-bar { padding: 10px; font-size: 12px; color: #666; background: #111; }
+        .player-wrapper { position: relative; width: 800px; height: 450px; background: #000; margin: auto; border-radius: 12px; overflow: hidden; }
+        iframe { width: 100%; height: 100%; border: none; }
+        
+        /* الطبقة الخارجية التي ستغطي الزر الأزرق */
+        .custom-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); /* تعتيم بسيط */
+            display: flex; justify-content: center; align-items: center;
+            z-index: 10; cursor: pointer; transition: 0.5s;
+        }
+        
+        /* زر التشغيل الأحمر الخاص بك */
+        .play-btn-red {
+            width: 80px; height: 80px; background: #ff0000; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 0 20px rgba(255,0,0,0.5); transition: 0.3s;
+        }
+        .play-btn-red:hover { transform: scale(1.1); background: #cc0000; }
+        .play-btn-red svg { fill: white; width: 40px; margin-left: 5px; }
+
+        .hidden { opacity: 0; pointer-events: none; }
     </style>
 </head>
 <body>
 
 <div class="player-wrapper">
-    <iframe id="videoPlayer" src="https://otaku-zone.seekplayer.vip/#5jbhu&api=zone11rs.github.io" allowfullscreen></iframe>
-    <div class="status-bar" id="status">جاري الاتصال بـ UI المشغل...</div>
+    <div class="custom-overlay" id="overlay" onclick="startVideo()">
+        <div class="play-btn-red">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+    </div>
+
+    <iframe id="mainPlayer" src="https://otaku-zone.seekplayer.vip/#5jbhu" allow="autoplay"></iframe>
 </div>
 
 <script>
-    const iframe = document.getElementById('videoPlayer');
-    const myToken = "d49f4971ed032005980c7443"; // التوكن الخاص بك من الصورة
-
-    // وظيفة إرسال الأوامر لتغيير التصميم الداخلي
-    function updateInternalUI() {
-        const config = {
-            api_token: myToken,
-            action: 'set_player_style', // الكود الذي يفهمه SeekStreaming
-            params: {
-                primary_color: '#ff0000', // تحويل الزر للأحمر
-                auto_play: false,
-                hide_logo: true
-            }
-        };
-
-        // إرسال "الأعصاب" لداخل المشغل
-        iframe.contentWindow.postMessage(JSON.stringify(config), '*');
-        document.getElementById('status').innerText = "تم تحديث الواجهة: اللون الأحمر مفعل ✅";
+    function startVideo() {
+        const overlay = document.getElementById('overlay');
+        const iframe = document.getElementById('mainPlayer');
+        
+        // 1. إخفاء الطبقة الحمراء
+        overlay.classList.add('hidden');
+        
+        // 2. أمر المشغل بالبدء تلقائياً (عبر الـ API المتاح)
+        iframe.contentWindow.postMessage(JSON.stringify({ "event": "command", "func": "playVideo" }), '*');
+        
+        // إذا لم يدعم السيرفر التشغيل التلقائي، سيضطر المستخدم لضغطة ثانية، 
+        // لكن على الأقل الشكل الأول الذي رآه كان احترافياً وباللون الأحمر.
     }
-
-    // انتظر المشغل حتى يبدأ ثم أرسل الأوامر
-    window.addEventListener('message', function(event) {
-        // إذا أرسل المشغل رسالة "جاهز" (Ready)
-        if (event.data && event.data.type === 'ready') {
-            updateInternalUI();
-        }
-    });
-
-    // كخيار احتياطي عند تحميل الصفحة
-    iframe.onload = updateInternalUI;
 </script>
 
 </body>
